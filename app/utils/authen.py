@@ -16,8 +16,10 @@ async def is_blacklisted(token, session) -> bool:
         user = result.scalars().first()
         if not user:
            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        if not user.verify:
+           raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Check your mail and Verify your account first") 
         if not user.is_active:
-           raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User account is inactive")
+           raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User account has been blocked due to flagged activities, please contact admin")
         statement = select(BlackList).where(BlackList.black_token == token)
         stat_result = await session.execute(statement)
         result = stat_result.scalars().first()
