@@ -44,18 +44,11 @@ class Users(SQLModel, table=True):
     classrooms: List["ClassRoom"] = Relationship(back_populates="users")
     studenttasks: List["StudentTask"] = Relationship(back_populates="users")
 
-    #validators
-    @field_validator("course", "role", mode = "before")
-    def normalize_fields(cls, value):
-        if isinstance(value, str):
-            return value.strip().titlecase()
-        return value
-
 class BlackList(SQLModel, table=True):
     black_token: str = Field(primary_key=True)
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
     #foreign keys
-    user_id: str = Field(foreign_key="user.id")
+    user_id: str = Field(foreign_key="users.id")
 
     #defining relationships
     users: Optional["Users"] = Relationship(back_populates="blacklists")
@@ -75,18 +68,13 @@ class Task(SQLModel, table=True):
     course: str = Field(default="Data Analysis", sa_column=Column(String, nullable=False, index=True))
     level: str = Field(default="Beginner", sa_column=Column(String, nullable=False, index=True))
     #foreign key
-    user_id: str = Field(foreign_key="user.id")
+    user_id: str = Field(foreign_key="users.id")
     #relationships
     users: Optional["Users"] = Relationship(back_populates="tasks")
     #define relationships
     classrooms: List["ClassRoom"] = Relationship(back_populates="task")
     studenttasks: List["StudentTask"] = Relationship(back_populates="task")
-    #field_validator
-    @field_validator("course", "role", mode = "before")
-    def normalize_fields(cls, value):
-        if isinstance(value, str):
-            return value.strip().titlecase()
-        return value
+    #field_validator if need be
 
 class StudentTask(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), sa_column=Column(String(36), primary_key=True, nullable=False))
@@ -97,7 +85,7 @@ class StudentTask(SQLModel, table=True):
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
     updated_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False))
     #foreign key
-    user_id: str = Field(foreign_key="user.id")
+    user_id: str = Field(foreign_key="users.id")
     task_id: str = Field(foreign_key="task.task_id")
     #relationships
     users: Optional["Users"] = Relationship(back_populates="studenttasks")
@@ -115,7 +103,7 @@ class ClassRoom(SQLModel, table=True):
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
     updated_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False))
     #foreign key
-    user_id: str = Field(foreign_key="user.id")
+    user_id: str = Field(foreign_key="users.id")
     task_id: str = Field(foreign_key="task.task_id")
     #relationships 
     users: Optional["Users"] = Relationship(back_populates="classrooms") #one to many
@@ -129,7 +117,7 @@ class Subscription(SQLModel, table=True):
     version: int = Field(sa_column=Column(Integer, nullable=False, index=True))
     course: str = Field(sa_column=Column(String, nullable=False, index=True))
     #foreign key
-    user_id: str = Field(foreign_key="user.id")
+    user_id: str = Field(foreign_key="users.id")
     #relationships 
     users: Optional["Users"] = Relationship(back_populates="subscriptions")
     #defining relationships
@@ -145,7 +133,7 @@ class UserSubscription(SQLModel, table=True):
     filetype: str = Field(sa_column=Column(String, nullable=False, index=True))
     sub_status: str = Field(default="Inactive", sa_column=Column(String, nullable=False, index=True))
     #foreign key
-    user_id: str = Field(foreign_key="user.id")
+    user_id: str = Field(foreign_key="users.id")
     sub_id: str = Field(foreign_key="subscription.sub_id")
     #relationships 
     users: Optional["Users"] = Relationship(back_populates="usersubscriptions")

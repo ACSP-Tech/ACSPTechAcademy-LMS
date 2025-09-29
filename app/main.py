@@ -7,14 +7,13 @@ from contextlib import asynccontextmanager
 
 
 #import router
-from .routers import keep_alive
+from .routers import keep_alive, root
 
 #scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
-
     yield
 
 
@@ -27,10 +26,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-#definiing the cors function
+#definiing the cors function and any other custom middleware
 configure_cors(app)
 
 
 #include routers
 app.include_router(keep_alive.router)
-
+app.include_router(root.router)
