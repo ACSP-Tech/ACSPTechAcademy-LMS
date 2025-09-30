@@ -7,7 +7,8 @@ from contextlib import asynccontextmanager
 
 
 #import router
-from .routers import keep_alive, root
+from .routers import keep_alive
+from .routers.root import router as root
 
 #scheduler = AsyncIOScheduler()
 
@@ -32,4 +33,4 @@ configure_cors(app)
 
 #include routers
 app.include_router(keep_alive.router)
-app.include_router(root.router)
+app.include_router(root)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter
 
 router = APIRouter()
 
@@ -6,7 +6,3 @@ router = APIRouter()
 @router.get("/")
 async def root():
     return {"app_name": "ACSP Learning Management Software",}
-
-@router.head("/")
-async def root_head():
-    return Response(status_code=200)
