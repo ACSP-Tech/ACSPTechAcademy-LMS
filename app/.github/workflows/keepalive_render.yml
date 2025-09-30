@@ -1,0 +1,26 @@
+name: Render Keep-Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # every 10 minutes
+  workflow_dispatch: {}
+
+jobs:
+  ping_render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /cron endpoint
+        env:
+          CRON_URL: ${{ secrets.CRON_URL }} # e.g. https://your-app.onrender.com/cron
+        run: |
+          if [ -z "$CRON_URL" ]; then
+            echo "CRON_URL not set in secrets"
+            exit 1
+          fi
+
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$CRON_URL" --fail)
+          echo "Render keepalive returned $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Render keepalive failed with status $HTTP_STATUS" >&2
+            exit 1
+          fi
