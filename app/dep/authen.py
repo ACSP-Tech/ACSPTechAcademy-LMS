@@ -36,7 +36,7 @@ def student_auth(token=Depends(user_auth)):
     except HTTPException as http_exc:
        raise http_exc 
    
-def teacher_auth(token=Depends(student_auth)):
+def teacher_auth(token=Depends(user_auth)):
     """
     Dependency to ensure the user is an admin or superadmin.
     """
@@ -52,7 +52,7 @@ def teacher_auth(token=Depends(student_auth)):
     except HTTPException as http_exc:
        raise http_exc   
    
-def admin_auth(token=Depends(teacher_auth)):
+def admin_auth(token=Depends(user_auth)):
     """
     Dependency to ensure the user is an admin or superadmin.
     """
@@ -68,7 +68,7 @@ def admin_auth(token=Depends(teacher_auth)):
     except HTTPException as http_exc:
        raise http_exc
    
-def superadmin_auth(token=Depends(admin_auth)):
+def superadmin_auth(token=Depends(user_auth)):
    """
    Dependency to ensure the user is a superadmin.
    """
