@@ -1,0 +1,28 @@
+name: Keep Aiven Warm
+
+on:
+  schedule:
+    # Run every 2 hours
+    - cron: '0 */4 * * *'
+  workflow_dispatch: {}  # allows manual trigger
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call keepalive endpoint
+        env:
+          KEEP_ALIVE_TOKEN: ${{ secrets.KEEP_ALIVE_TOKEN }}
+          KEEPALIVE_URL: ${{ secrets.KEEPALIVE_URL }}   # e.g. https://your-app.example.com/internal/keepalive
+        run: |
+          if [ -z "$KEEP_ALIVE_TOKEN" ] || [ -z "$KEEPALIVE_URL" ]; then
+            echo "KEEP_ALIVE_TOKEN or KEEPALIVE_URL not set in secrets"
+            exit 1
+          fi
+
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$KEEPALIVE_URL" -H "x-token: $KEEP_ALIVE_TOKEN" --fail)
+          echo "Keepalive returned $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Keepalive failed with status $HTTP_STATUS" >&2
+            exit 1
+          fi
