@@ -21,8 +21,6 @@ class Users(SQLModel, table=True):
         sa_column=Column(String, nullable=False))
     phone_number: str = Field(
         sa_column=Column(String, nullable=False))
-    gender: str = Field(
-        sa_column=Column(String, nullable=False))
     course: str = Field(default="Na",
         sa_column=Column(String, nullable=False, index=True))
     role: str = Field(
