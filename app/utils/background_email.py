@@ -92,7 +92,7 @@ async def send_welcome_email(email: str, username: str):
                 <p>Here's what you can do next:</p>
                 <ul>
                     <li>Complete your profile</li>
-                    <li>Browse available courses in the subscription field</li>
+                    <li>Browse available courses in the course field</li>
                     <li>Join our community via WhatsApp</li>
                 </ul>
                 

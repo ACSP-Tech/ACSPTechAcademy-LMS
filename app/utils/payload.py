@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 async def decode_token(token):
     try:
-        return await jwt.decode(token, SECRET_KEY, ALGORITHM)
+        return jwt.decode(token, SECRET_KEY, ALGORITHM)
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
