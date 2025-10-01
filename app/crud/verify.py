@@ -10,7 +10,7 @@ async def verify_user(token, backgroundtask, session):
         payload = await decode_token(token)
         user_type = payload.get("type")
         phone_number = payload.get("phone_number")
-        email = payload.get("phone_number")
+        email = payload.get("email")
         if user_type != "email_verification":
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

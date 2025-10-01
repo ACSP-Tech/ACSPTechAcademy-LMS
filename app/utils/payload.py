@@ -17,7 +17,7 @@ async def decode_token(token):
             detail="Invalid token. Please log in again.",
         )
     
-async def encode_token(payload, expires_delta: int = 120):
+async def encode_token(payload, expires_delta: int = 720):
     """
     Encode a JWT token with the given payload and expiration time.
     Args:

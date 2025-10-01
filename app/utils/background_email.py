@@ -46,7 +46,7 @@ async def send_verification_email(email, token, username):
                 </p>
                 
                 <p style="color: #666; font-size: 14px;">
-                    This link will expire in 24 hours.
+                    This link will expire in 12 hours.
                 </p>
                 
                 <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
