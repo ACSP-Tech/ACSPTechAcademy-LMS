@@ -36,5 +36,5 @@ class Register(BaseModel):
         return v
 
 
-class RegisterOut(BaseModel):
+class MessageOut(BaseModel):
     message: str

@@ -3,6 +3,8 @@ from fastapi import HTTPException, status
 from sqlmodel import select, func
 from ..utils.hash_password import password_hash
 from ..utils.payload import encode_token
+from ..utils.background_email import send_verification_email
+from ..schema.register import MessageOut
 
 async def user_register(data, session, backgroundtask):
     try:
@@ -48,7 +50,14 @@ async def user_register(data, session, backgroundtask):
             "type": "email_verification"
         }
         email_token = await encode_token(payload)
-
+        backgroundtask.add_task(
+            send_verification_email,
+            email=data.email,
+            token=email_token,
+            username=data.first_name
+        )
+        response = f"Account successfully registered, Kindly check {data.email} inbox to verify your account"
+        return MessageOut(message=response)
     except HTTPException as Httpexc:
         await session.rollback()
         raise Httpexc

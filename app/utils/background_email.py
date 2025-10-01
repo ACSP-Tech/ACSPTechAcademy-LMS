@@ -15,7 +15,7 @@ async def send_verification_email(email, token, username):
     """
     # Your frontend URL (change this to your actual frontend URL)
     backend_url = "https://acsp-tech-academy.onrender.com"
-    verification_link = f"{backend_url}/verify-email?token={token}"
+    verification_link = f"{backend_url}/user/verify-email?token={token}"
     
     html_body = f"""
     <html>
@@ -69,7 +69,7 @@ async def send_verification_email(email, token, username):
     await fm.send_message(message)
 
 
-async def send_welcome_email(email, username):
+async def send_welcome_email(email: str, username: str):
     """
     Send welcome email after successful verification
     
@@ -77,6 +77,8 @@ async def send_welcome_email(email, username):
         email: User's email
         username: User's name
     """
+    whatsapp_link = "https://whatsapp.com/channel/0029Vb5hRHaKbYMMXPoFrJ3N"
+    
     html_body = f"""
     <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -90,9 +92,28 @@ async def send_welcome_email(email, username):
                 <p>Here's what you can do next:</p>
                 <ul>
                     <li>Complete your profile</li>
-                    <li>Browse available courses</li>
-                    <li>Join our community</li>
+                    <li>Browse available courses in the subscription field</li>
+                    <li>Join our community via WhatsApp</li>
                 </ul>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{whatsapp_link}" 
+                       style="background-color: #25D366; 
+                              color: white; 
+                              padding: 15px 40px; 
+                              text-decoration: none; 
+                              border-radius: 8px;
+                              display: inline-block;
+                              font-weight: bold;
+                              font-size: 16px;
+                              box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3);">
+                        📱 Join Our WhatsApp Channel
+                    </a>
+                </div>
+                
+                <p style="text-align: center; color: #666; font-size: 14px; margin-top: 20px;">
+                    Stay updated with course announcements, tips, and community support!
+                </p>
                 
                 <p>Happy learning!</p>
                 
