@@ -4,6 +4,8 @@ from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from typing import AsyncGenerator
 from .model.lms_tables import Users
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from fastapi import HTTPException
 
 #normalize aiven url
 def normalize_url(url: str) -> str:
@@ -27,7 +29,7 @@ ASYNC_DATABASE_URL = normalize_url(DATABASE_URL)
 # SQLModel engine
 engine = create_async_engine(
     ASYNC_DATABASE_URL,
-    echo=False,  # Optional: set to False in production
+    echo=True,  # Optional: set to False in production
     future=True
 )
 #async session maker
@@ -40,6 +42,12 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             yield session
             # commit after the endpoint function finishes successfully
             await session.commit()
+        except IntegrityError:
+            await session.rollback()
+            raise
+        except SQLAlchemyError:
+            await session.rollback()
+            raise
         except Exception:
             await session.rollback()
             raise

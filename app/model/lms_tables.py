@@ -20,15 +20,14 @@ class Users(SQLModel, table=True):
     last_name: str = Field(
         sa_column=Column(String, nullable=False))
     phone_number: str = Field(
-        sa_column=Column(String, nullable=False))
-    gender: str = Field(
-        sa_column=Column(String, nullable=False))
+        sa_column=Column(String, unique=True, nullable=False, index=True))
     course: str = Field(default="Na",
         sa_column=Column(String, nullable=False, index=True))
     role: str = Field(
         sa_column=Column(String, nullable=False, index=True))
     is_active: bool = Field(default=True, index=True)
     verify: bool = Field(default=False, index=True)
+    num_verify: bool = Field(default=False, index=True)
     version: int = Field(default= 0, sa_column=Column(Integer, nullable=False, index=True))
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
     updated_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False))
@@ -39,7 +38,7 @@ class Users(SQLModel, table=True):
     #defining relationships
     tasks: List["Task"] = Relationship(back_populates="users")
     blacklists: List["BlackList"] = Relationship(back_populates="users")
-    Usersubscriptions: List["UserSubscription"] = Relationship(back_populates="users")
+    usersubscriptions: List["UserSubscription"] = Relationship(back_populates="users")
     subscriptions: List["Subscription"] = Relationship(back_populates="users")
     classrooms: List["ClassRoom"] = Relationship(back_populates="users")
     studenttasks: List["StudentTask"] = Relationship(back_populates="users")

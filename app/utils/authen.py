@@ -8,7 +8,7 @@ from .payload import decode_token
 
 async def is_blacklisted(token, session) -> bool:
     try:
-        payload = decode_token(token)
+        payload = await decode_token(token)
         email = payload.get("email")
         id = payload.get("id")
         statement = select(Users).where(and_(Users.email == email, Users.id == id))
