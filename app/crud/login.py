@@ -38,7 +38,7 @@ async def user_login(data, session, backgroundtask):
             )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"account not verified, verification mail has been resent, please verify your account before login"
+                detail=f"account not verified, please verify your account before login"
             )
         payload = {
             "email": user.email,
