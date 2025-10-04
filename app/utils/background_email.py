@@ -1,8 +1,12 @@
-from ..sec import conf
 from fastapi_mail import FastMail, MessageSchema, MessageType
+from mailjet_rest import Client
 
-fm = FastMail(conf)
+from decouple import config
 
+mailjet = Client(
+    auth=(config('MAILJET_API_KEY'), config('MAILJET_SECRET_KEY')),
+    version='v3.1'
+)
 
 async def send_verification_email(email, token, username):
     """
@@ -21,7 +25,7 @@ async def send_verification_email(email, token, username):
     <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #4CAF50;">Welcome to ACSP Tech Academy! 🎉</h2>
+                <h2 style="color: #4CAF50;">Welcome to Bookify! 🎉</h2>
                 
                 <p>Hi {username},</p>
                 
@@ -46,7 +50,7 @@ async def send_verification_email(email, token, username):
                 </p>
                 
                 <p style="color: #666; font-size: 14px;">
-                    This link will expire in 12 hours.
+                    This link will expire in 24 hours.
                 </p>
                 
                 <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
@@ -59,14 +63,50 @@ async def send_verification_email(email, token, username):
     </html>
     """
     
-    message = MessageSchema(
-        subject="Verify Your Email - ACSP Tech Academy",
-        recipients=[email],
-        body=html_body,
-        subtype=MessageType.html
-    )
+    # Plain text version (fallback)
+    text_body = f"""
+    Welcome to Bookify!
     
-    await fm.send_message(message)
+    Hi {username},
+    
+    Thank you for registering! Please verify your email address to activate your account.
+    
+    Click this link to verify: {verification_link}
+    
+    This link will expire in 24 hours.
+    
+    If you didn't create an account, please ignore this email.
+    """
+    
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": config('MAIL_FROM_EMAIL'),
+                    "Name": config('MAIL_FROM_NAME', default='ACSP Tech Academy')
+                },
+                "To": [
+                    {
+                        "Email": email,
+                        "Name": username
+                    }
+                ],
+                "Subject": "Verify Your Email - ACSP Tech Academy",
+                "TextPart": text_body,
+                "HTMLPart": html_body
+            }
+        ]
+    }
+    
+    try:
+        result = mailjet.send.create(data=data)
+        
+        if result.status_code == 200:
+            print(f"✅ Email sent successfully to {email}")
+        else:
+            print(f"❌ Mailjet API error: {result.status_code} - {result.json()}")      
+    except Exception as e:
+        print(f"❌ Failed to send verification email to {email}: {str(e)}")
 
 
 async def send_welcome_email(email: str, username: str):
@@ -126,11 +166,57 @@ async def send_welcome_email(email: str, username: str):
     </html>
     """
     
-    message = MessageSchema(
-        subject="Welcome to ACSP Tech Academy!",
-        recipients=[email],
-        body=html_body,
-        subtype=MessageType.html
-    )
+    # Plain text version (fallback)
+    text_body = f"""
+    Welcome Aboard!
     
-    await fm.send_message(message)
+    Hi {username},
+    
+    Your email has been verified successfully! You're all set to start your learning journey.
+    
+    Here's what you can do next:
+    - Complete your profile
+    - Browse available courses in the course field
+    - Join our community via WhatsApp
+    
+    Join our WhatsApp Channel: {whatsapp_link}
+    
+    Stay updated with course announcements, tips, and community support!
+    
+    Happy learning!
+    
+    Best regards,
+    ACSP Tech Academy Team
+    """
+    
+    data = {
+        'Messages': [
+            {
+                "From": {
+                    "Email": config('MAIL_FROM_EMAIL'),
+                    "Name": config('MAIL_FROM_NAME', default='ACSP Tech Academy')
+                },
+                "To": [
+                    {
+                        "Email": email,
+                        "Name": username
+                    }
+                ],
+                "Subject": "Welcome to ACSP Tech Academy!",
+                "TextPart": text_body,
+                "HTMLPart": html_body
+            }
+        ]
+    }
+    
+    try:
+        print(f"Attempting to send welcome email to {email} via Mailjet")
+        result = mailjet.send.create(data=data)
+        
+        if result.status_code == 200:
+            print(f"✅ Welcome email sent successfully to {email}")
+        else:
+            print(f"❌ Mailjet API error: {result.status_code} - {result.json()}")
+            
+    except Exception as e:
+        print(f"❌ Failed to send welcome email to {email}: {str(e)}")

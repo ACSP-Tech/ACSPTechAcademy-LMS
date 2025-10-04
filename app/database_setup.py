@@ -29,7 +29,7 @@ ASYNC_DATABASE_URL = normalize_url(DATABASE_URL)
 # SQLModel engine
 engine = create_async_engine(
     ASYNC_DATABASE_URL,
-    echo=True,  # Optional: set to False in production
+    echo=False,  # Optional: set to False in production
     future=True
 )
 #async session maker

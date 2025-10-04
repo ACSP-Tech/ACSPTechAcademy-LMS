@@ -34,6 +34,9 @@ class Register(BaseModel):
         if not pattern.match(v):
             raise ValueError("Phone number must be in valid E.164 format (e.g., +14155552671)")
         return v
+    @field_validator("email")
+    def normalize_email(cls, v: str) -> str:
+        return v.strip().lower()
 
 
 class MessageOut(BaseModel):
