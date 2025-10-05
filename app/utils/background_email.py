@@ -1,12 +1,9 @@
-from fastapi_mail import FastMail, MessageSchema, MessageType
-from mailjet_rest import Client
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Email, To, Content
 
 from decouple import config
 
-mailjet = Client(
-    auth=(config('MAILJET_API_KEY'), config('MAILJET_SECRET_KEY')),
-    version='v3.1'
-)
+sg = SendGridAPIClient(config('SENDGRID_API_KEY'))
 
 async def send_verification_email(email, token, username):
     """
@@ -25,7 +22,7 @@ async def send_verification_email(email, token, username):
     <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #4CAF50;">Welcome to Bookify! 🎉</h2>
+                <h2 style="color: #4CAF50;">Welcome to ACSPTechAcademy! 🎉</h2>
                 
                 <p>Hi {username},</p>
                 
@@ -64,47 +61,52 @@ async def send_verification_email(email, token, username):
     """
     
     # Plain text version (fallback)
-    text_body = f"""
-    Welcome to Bookify!
+    # text_body = f"""
+    # Welcome to Bookify!
     
-    Hi {username},
+    # Hi {username},
     
-    Thank you for registering! Please verify your email address to activate your account.
+    # Thank you for registering! Please verify your email address to activate your account.
     
-    Click this link to verify: {verification_link}
+    # Click this link to verify: {verification_link}
     
-    This link will expire in 24 hours.
+    # This link will expire in 24 hours.
     
-    If you didn't create an account, please ignore this email.
-    """
+    # If you didn't create an account, please ignore this email.
+    # """
     
-    data = {
-        'Messages': [
-            {
-                "From": {
-                    "Email": config('MAIL_FROM_EMAIL'),
-                    "Name": config('MAIL_FROM_NAME', default='ACSP Tech Academy')
-                },
-                "To": [
-                    {
-                        "Email": email,
-                        "Name": username
-                    }
-                ],
-                "Subject": "Verify Your Email - ACSP Tech Academy",
-                "TextPart": text_body,
-                "HTMLPart": html_body
-            }
-        ]
-    }
+    # data = {
+    #     'Messages': [
+    #         {
+    #             "From": {
+    #                 "Email": config('MAIL_FROM_EMAIL'),
+    #                 "Name": config('MAIL_FROM_NAME', default='ACSP Tech Academy')
+    #             },
+    #             "To": [
+    #                 {
+    #                     "Email": email,
+    #                     "Name": username
+    #                 }
+    #             ],
+    #             "Subject": "Verify Your Email - ACSP Tech Academy",
+    #             "TextPart": text_body,
+    #             "HTMLPart": html_body
+    #         }
+    #     ]
+    # }
     
     try:
-        result = mailjet.send.create(data=data)
+        print(f"📧 Attempting to send verification email to {email}")
         
-        if result.status_code == 200:
-            print(f"✅ Email sent successfully to {email}")
-        else:
-            print(f"❌ Mailjet API error: {result.status_code} - {result.json()}")      
+        message = Mail(
+            from_email=Email(config('MAIL_FROM_EMAIL'), config('MAIL_FROM_NAME')),
+            to_emails=To(email, username),
+            subject='Verify Your Email - ACSP Tech Academy',
+            html_content=Content("text/html", html_body)
+        )
+        
+        response = sg.send(message)
+        print("email successfully sent")    
     except Exception as e:
         print(f"❌ Failed to send verification email to {email}: {str(e)}")
 
@@ -210,13 +212,16 @@ async def send_welcome_email(email: str, username: str):
     }
     
     try:
-        print(f"Attempting to send welcome email to {email} via Mailjet")
-        result = mailjet.send.create(data=data)
+        print(f"📧 Attempting to send verification email to {email}")
         
-        if result.status_code == 200:
-            print(f"✅ Welcome email sent successfully to {email}")
-        else:
-            print(f"❌ Mailjet API error: {result.status_code} - {result.json()}")
-            
+        message = Mail(
+            from_email=Email(config('MAIL_FROM_EMAIL'), config('MAIL_FROM_NAME')),
+            to_emails=To(email, username),
+            subject='Verify Your Email - ACSP Tech Academy',
+            html_content=Content("text/html", html_body)
+        )
+        
+        response = sg.send(message)
+        print("email successfully sent")    
     except Exception as e:
-        print(f"❌ Failed to send welcome email to {email}: {str(e)}")
+        print(f"❌ Failed to send verification email to {email}: {str(e)}")
