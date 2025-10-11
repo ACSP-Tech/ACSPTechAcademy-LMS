@@ -8,11 +8,12 @@ router = APIRouter(prefix="/user", tags=["User Authentication"])
 @router.post("/signin", response_model=LogOut, status_code=status.HTTP_200_OK)
 async def Login(data:LoginUser, backgroundtask:BackgroundTasks, session=Depends(get_db)):
     """
-    User Login API
+    User Login API: send verification email if account not verified, else login user and return token
+    Frontend integration
     Args:
         data: LoginUser Schema Body parameter
         session: default to database session
-        raise:
+        raise: 404 user not found, 401 invalid password, 403 account not verified, 500 internal server error
     Returns:
         Logout schema json response
         200 ok response

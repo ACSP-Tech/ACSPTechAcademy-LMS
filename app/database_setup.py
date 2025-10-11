@@ -36,12 +36,10 @@ engine = create_async_engine(
 async_session = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
 #asyn session
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_db():
     async with async_session() as session:
         try:
             yield session
-            # commit after the endpoint function finishes successfully
-            await session.commit()
         except IntegrityError:
             await session.rollback()
             raise
