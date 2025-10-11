@@ -12,7 +12,7 @@ async def user_reset_password(data, session):
         user_email = data.email
         new_password = data.new_password
         # Build subquery to get distinct book_ids for user with Returned/Expired status
-        otp_stmt = select(distinct(OTP.user_id).label('user_id')).where(
+        otp_stmt = select(OTP).where(
                 and_(
                     OTP.email == user_email,
                     OTP.status == "Available",
