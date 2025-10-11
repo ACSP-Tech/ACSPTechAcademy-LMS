@@ -1,4 +1,4 @@
-from sqlmodel import select, and_
+from sqlmodel import select, and_, update
 from fastapi import HTTPException, status
 from ..model.lms_tables import Users, OTP
 from datetime import datetime, timedelta, timezone
@@ -27,17 +27,16 @@ async def user_forgot_password(data, session, backgroundtask):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Inactive user, contact support"
             )
-        #expire existing otp if any
-        statement = select(OTP).where(and_(OTP.user_id == user.id, OTP.status.in_(["Pending", "Available"])))
-        result = await session.execute(statement)
-        existing_otp = result.scalars().all()
-        if existing_otp:
-            now = datetime.now(timezone.utc)
-            for entry in existing_otp:
-                entry.expires_at = now  # mark as expired immediately
-                entry.status = "Expired"
-            await session.commit()
-            await session.refresh(existing_otp)
+        #batch expire existing otp if any
+        await session.execute(
+            update(OTP)
+            .where(and_(OTP.user_id == user.id, OTP.status.in_(["Pending", "Available"])))
+            .values(
+                status="Expired",
+                expires_at=datetime.now(timezone.utc)
+            )
+        )
+        await session.commit()
         # generate otp
         otp = await generate_otp()
         otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=OTP_EXPIRY_MINUTES)
