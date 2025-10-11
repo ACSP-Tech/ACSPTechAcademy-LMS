@@ -8,7 +8,7 @@ async def user_verify_otp(data, session):
     """Verify user OTP"""
     try:
         user_email = data.email
-        otp_code = data.otp
+        otp = data.otp
         # Check if valid forget email request exists
         statement = select(OTP).where(and_(OTP.email == user_email, OTP.status == "Pending"))
         result = await session.execute(statement)
@@ -19,7 +19,7 @@ async def user_verify_otp(data, session):
                 detail="Invalid otp request, please request a new otp"
             )
         # Check if OTP matches
-        if otp_entry_check.otp != otp_code:
+        if otp_entry_check.otp_code != otp:
             otp_entry_check.attempts += 1
             await session.commit()
             await session.refresh(otp_entry_check)
