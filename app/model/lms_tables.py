@@ -25,9 +25,9 @@ class Users(SQLModel, table=True):
         sa_column=Column(String, nullable=False, index=True))
     role: str = Field(
         sa_column=Column(String, nullable=False, index=True))
-    is_active: bool = Field(default=True, index=True)
-    verify: bool = Field(default=False, index=True)
-    num_verify: bool = Field(default=False, index=True)
+    is_active: bool = Field(sa_column=Column(Boolean, nullable=True, server_default="false", index=True))
+    verify: bool = Field(sa_column=Column(Boolean, nullable=False, server_default="false", index=True))
+    num_verify: bool = Field(sa_column=Column(Boolean, nullable=False, server_default="false", index=True))
     version: int = Field(default= 0, sa_column=Column(Integer, nullable=False, index=True))
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
     updated_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False))

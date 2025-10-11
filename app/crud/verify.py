@@ -12,7 +12,7 @@ async def verify_user(token, backgroundtask, session):
         phone_number = payload.get("phone_number")
         email = payload.get("email")
         if user_type != "email_verification":
-            response = "Email verified successfully! Check your mail for the next steps, You can now login."
+            response = "Email verified successfully! you Check your mail for the next steps, You can now login."
             return MessageOut(
                 message=response
             )
@@ -20,7 +20,7 @@ async def verify_user(token, backgroundtask, session):
         result = await session.execute(statement)
         user = result.scalars().first()
         if not user:
-            response = "Email verified successfully! Check your mail for the next steps, You can now login."
+            response = "Email verified successfully! you can Check your mail for the next steps, You can now login."
             return MessageOut(
                 message=response
             )
@@ -37,8 +37,8 @@ async def verify_user(token, backgroundtask, session):
         # verify user
         user.verify = True
         # save to db
-        session.commit()
-        session.refresh(user)
+        await session.commit()
+        await session.refresh(user)
         # send welcome email
         backgroundtask.add_task(
             send_welcome_email,
