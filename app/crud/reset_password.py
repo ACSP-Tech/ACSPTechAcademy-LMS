@@ -12,7 +12,7 @@ async def user_reset_password(data, session):
         user_email = data.email
         new_password = data.new_password
         # Build subquery to get distinct book_ids for user with Returned/Expired status
-        otp_stmt = select(distinct(OTP.user_id).label('user_id')).where(
+        otp_stmt = select(OTP).where(
                 and_(
                     OTP.email == user_email,
                     OTP.status == "Available",
@@ -21,7 +21,7 @@ async def user_reset_password(data, session):
                 )
             )
         otp_result = await session.execute(otp_stmt)
-        otp_entry = otp_result.first()
+        otp_entry = otp_result.scalars().first()
         if not otp_entry:
             response = "Password reset successfully! You can now login with your new password."
             return MessageOut(
