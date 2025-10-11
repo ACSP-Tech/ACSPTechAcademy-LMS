@@ -1,4 +1,4 @@
-from sqlmodel import select, and_, in_
+from sqlmodel import select, and_
 from fastapi import HTTPException, status
 from ..model.lms_tables import Users, OTP
 from datetime import datetime, timedelta, timezone
