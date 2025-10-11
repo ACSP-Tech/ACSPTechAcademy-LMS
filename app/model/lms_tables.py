@@ -2,7 +2,7 @@ import uuid
 from sqlmodel import SQLModel, Field, Column, Relationship
 from datetime import datetime, date
 from pydantic import EmailStr, field_validator
-from sqlalchemy import String, func, DateTime, Integer, desc, Index
+from sqlalchemy import String, func, DateTime, Integer, desc, Index, Boolean
 from typing import List, Optional
 
 class Users(SQLModel, table=True):
@@ -42,6 +42,7 @@ class Users(SQLModel, table=True):
     subscriptions: List["Subscription"] = Relationship(back_populates="users")
     classrooms: List["ClassRoom"] = Relationship(back_populates="users")
     studenttasks: List["StudentTask"] = Relationship(back_populates="users")
+    otps: List["OTP"] = Relationship(back_populates="users")
 
 class BlackList(SQLModel, table=True):
     black_token: str = Field(primary_key=True)
@@ -51,6 +52,21 @@ class BlackList(SQLModel, table=True):
 
     #defining relationships
     users: Optional["Users"] = Relationship(back_populates="blacklists")
+
+class OTP(SQLModel, table=True):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), sa_column=Column(String(36), primary_key=True, nullable=False))
+    email: str = Field(sa_column=Column(String, nullable=False, index=True))
+    otp_code: str = Field(sa_column=Column(String, nullable=False, index=True))
+    attempts: int = Field(default=0, sa_column=Column(Integer, nullable=False, index=True))
+    created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
+    expires_at: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
+    verified: bool = Field(default=False, sa_column=Column(Boolean, index=True))
+    status: str = Field(default="Pending", sa_column=Column(String, nullable=False, index=True))
+    updated_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False))
+    #foreign key
+    user_id: str = Field(foreign_key="users.id")
+    #relationships
+    users: Optional["Users"] = Relationship(back_populates="otps")
 
 class Task(SQLModel, table=True):
     task_id: str = Field(

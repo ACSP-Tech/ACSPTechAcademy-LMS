@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response
 
-router = APIRouter()
+router = APIRouter(tags=["Root"])
 
 # Render liveness check
 @router.get("/")

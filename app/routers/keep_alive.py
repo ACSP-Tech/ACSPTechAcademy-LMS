@@ -4,7 +4,7 @@ from sqlalchemy import text
 from ..database_setup import get_db
 from ..sec import KEEP_ALIVE_TOKEN
 
-router = APIRouter()
+router = APIRouter(tags=["Keep Alive"])
 
 @router.post("/internal/keepalive")
 async def keepalive(x_token: str = Header(None), session=Depends(get_db)):

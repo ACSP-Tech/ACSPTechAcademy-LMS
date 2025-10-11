@@ -2,7 +2,7 @@ from ..model.lms_tables import Users
 from fastapi import HTTPException, status
 from sqlmodel import select, func
 from ..utils.hash_password import password_hash
-from ..utils.payload import encode_token
+from ..utils.payload import encode_email_token
 from ..utils.background_email import send_verification_email
 from ..schema.register import MessageOut
 
@@ -42,6 +42,8 @@ async def user_register(data, session, backgroundtask):
             role = user_role
         )
         session.add(new_user)
+        await session.commit()
+        await session.refresh(new_user)
 
         payload = {
             "email": data.email,
@@ -49,14 +51,14 @@ async def user_register(data, session, backgroundtask):
             "phone_number": data.phone_number,
             "type": "email_verification"
         }
-        email_token = await encode_token(payload)
+        email_token = await encode_email_token(payload)
         backgroundtask.add_task(
             send_verification_email,
             email=data.email,
             token=email_token,
             username=data.first_name
         )
-        response = f"Account successfully registered, Kindly check {data.email} inbox to verify your account"
+        response = f"Account successfully registered, Kindly check {data.email} inbox or spam folder to verify your account"
         return MessageOut(message=response)
     except HTTPException as Httpexc:
         await session.rollback()

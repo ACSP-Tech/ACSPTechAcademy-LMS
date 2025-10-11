@@ -1,9 +1,10 @@
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email, To, Content
-
 from decouple import config
 
 sg = SendGridAPIClient(config('SENDGRID_API_KEY'))
+
+OTP_EXPIRY_MINUTES = 5
 
 async def send_verification_email(email, token, username):
     """
@@ -96,11 +97,11 @@ async def send_verification_email(email, token, username):
     # }
     
     try:
-        print(f"📧 Attempting to send verification email to {email}")
+        print(f"Attempting to send verification email to {email}")
         
         message = Mail(
             from_email=Email(config('MAIL_FROM_EMAIL'), config('MAIL_FROM_NAME')),
-            to_emails=To(email, username),
+            to_emails=To(email),
             subject='Verify Your Email - ACSP Tech Academy',
             html_content=Content("text/html", html_body)
         )
@@ -108,10 +109,10 @@ async def send_verification_email(email, token, username):
         response = sg.send(message)
         print("email successfully sent")    
     except Exception as e:
-        print(f"❌ Failed to send verification email to {email}: {str(e)}")
+        print(f"Failed to send verification email to {email}: {str(e)}")
 
 
-async def send_welcome_email(email: str, username: str):
+async def send_welcome_email(email, username):
     """
     Send welcome email after successful verification
     
@@ -191,37 +192,111 @@ async def send_welcome_email(email: str, username: str):
     ACSP Tech Academy Team
     """
     
-    data = {
-        'Messages': [
-            {
-                "From": {
-                    "Email": config('MAIL_FROM_EMAIL'),
-                    "Name": config('MAIL_FROM_NAME', default='ACSP Tech Academy')
-                },
-                "To": [
-                    {
-                        "Email": email,
-                        "Name": username
-                    }
-                ],
-                "Subject": "Welcome to ACSP Tech Academy!",
-                "TextPart": text_body,
-                "HTMLPart": html_body
-            }
-        ]
-    }
+    # data = {
+    #     'Messages': [
+    #         {
+    #             "From": {
+    #                 "Email": config('MAIL_FROM_EMAIL'),
+    #                 "Name": config('MAIL_FROM_NAME', default='ACSP Tech Academy')
+    #             },
+    #             "To": [
+    #                 {
+    #                     "Email": email,
+    #                     "Name": username
+    #                 }
+    #             ],
+    #             "Subject": "Welcome to ACSP Tech Academy!",
+    #             "TextPart": text_body,
+    #             "HTMLPart": html_body
+    #         }
+    #     ]
+    # }
     
     try:
-        print(f"📧 Attempting to send verification email to {email}")
+        print(f"Attempting to send verification email to {email}")
         
         message = Mail(
             from_email=Email(config('MAIL_FROM_EMAIL'), config('MAIL_FROM_NAME')),
-            to_emails=To(email, username),
-            subject='Verify Your Email - ACSP Tech Academy',
+            to_emails=To(email),
+            subject='Welcome To ACSP Tech Academy',
             html_content=Content("text/html", html_body)
         )
         
         response = sg.send(message)
         print("email successfully sent")    
     except Exception as e:
-        print(f"❌ Failed to send verification email to {email}: {str(e)}")
+        print(f"Failed to send verification email to {email}: {str(e)}")
+
+
+async def send_otp_email(email, otp, username):
+    """
+    Send OTP email for password reset
+    
+    Args:
+        email: Recipient email address
+        otp: One-Time Password
+        username: User's name for personalization
+    """
+    html_body = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #4CAF50;">Password Reset Request</h2>
+                
+                <p>Hi {username},</p>
+                
+                <p>We received a request to reset your password. Use the OTP below to proceed:</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <span style="font-size: 24px; font-weight: bold; 
+                                 background-color: #f0f0f0; 
+                                 padding: 10px 20px; 
+                                 border-radius: 5px; 
+                                 letter-spacing: 4px;">
+                        {otp}
+                    </span>
+                </div>
+                
+                <p style="color: #666; font-size: 14px;">
+                    This OTP is valid for the next {OTP_EXPIRY_MINUTES} minutes.
+                </p>
+                
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                
+                <p style="color: #999; font-size: 12px;">
+                    If you didn't request a password reset, please ignore this email.
+                </p>
+            </div>
+        </body>
+    </html>
+    """
+    
+    # Plain text version (fallback)
+    text_body = f"""
+    Password Reset Request
+    
+    Hi {username},
+    
+    We received a request to reset your password. Use the OTP below to proceed:
+    
+    OTP: {otp}
+    
+    This OTP is valid for the next {OTP_EXPIRY_MINUTES} minutes.
+    
+    If you didn't request a password reset, please ignore this email.
+    """
+    
+    try:
+        print(f"Attempting to send verification email to {email}")
+        
+        message = Mail(
+            from_email=Email(config('MAIL_FROM_EMAIL'), config('MAIL_FROM_NAME')),
+            to_emails=To(email),
+            subject='Password Reset OTP - ACSP Tech Academy',
+            html_content=Content("text/html", html_body)
+        )
+        
+        response = sg.send(message)
+        print("email successfully sent")    
+    except Exception as e:
+        print(f"Failed to send verification email to {email}: {str(e)}")

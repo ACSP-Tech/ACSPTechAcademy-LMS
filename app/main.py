@@ -7,7 +7,7 @@ from contextlib import asynccontextmanager
 
 
 #import router
-from .routers import keep_alive, root, register, verify, login
+from .routers import keep_alive, root, register, verify, login, resend_email, logout, forgot_password, reset_password, verify_otp
 
 #scheduler = AsyncIOScheduler()
 
@@ -36,3 +36,8 @@ app.include_router(root.router)
 app.include_router(register.router)
 app.include_router(verify.router)
 app.include_router(login.router)
+app.include_router(resend_email.router)
+app.include_router(logout.router)
+app.include_router(forgot_password.router)
+app.include_router(reset_password.router)
+app.include_router(verify_otp.router)

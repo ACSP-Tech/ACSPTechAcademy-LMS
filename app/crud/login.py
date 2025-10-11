@@ -1,10 +1,11 @@
 from ..schema.login import LogOut
 from ..model.lms_tables import Users
-from ..utils.payload import encode_token
+from ..utils.payload import encode_email_token, encode_token
 from sqlmodel import select
 from fastapi import HTTPException, status
 from ..utils.hash_password import password_verify
 from ..utils.background_email import send_verification_email
+from fastapi.responses import JSONResponse
 
 
 async def user_login(data, session, backgroundtask):
@@ -29,16 +30,21 @@ async def user_login(data, session, backgroundtask):
                 "phone_number": user.phone_number,
                 "type": "email_verification"
             }
-            email_token = await encode_token(payload)
+            email_token = await encode_email_token(payload)
             backgroundtask.add_task(
                 send_verification_email,
                 email=user.email,
                 token=email_token,
                 username=user.first_name
             )
-            raise HTTPException(
+            return JSONResponse(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"account not verified, please verify your account before login"
+                content={"message": f"Account not verified. A verification has been sent, Check your Inbox and verify your account"}
+            )
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Inactive user, contact support"
             )
         payload = {
             "email": user.email,
