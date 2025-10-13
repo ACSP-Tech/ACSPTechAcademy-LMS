@@ -62,4 +62,10 @@ async def user_forgot_password(data, session, backgroundtask):
     except HTTPException as Httpexc:
         await session.rollback()
         raise Httpexc
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed: {str(e)}"
+        )  
 

@@ -34,6 +34,10 @@ class Users(SQLModel, table=True):
     sub_limit: int = Field(default= 1, sa_column=Column(Integer, nullable=False, index=True))
     current_stage: int = Field(default= 0, sa_column=Column(Integer, nullable=False, index=True))
     sub_deny_count:int = Field(default= 0, sa_column=Column(Integer, nullable=False, index=True))
+    profile_picture: Optional[str] = Field(default=None, sa_column=Column(String, nullable=True, index=True))
+    profile_public_id: Optional[str] = Field(default=None, sa_column=Column(String, nullable=True, index=True))
+    country: Optional[str] = Field(default=None, sa_column=Column(String, nullable=True, index=True))
+    gender: Optional[str] = Field(default=None, sa_column=Column(String, nullable=True, index=True))
 
     #defining relationships
     tasks: List["Task"] = Relationship(back_populates="users")

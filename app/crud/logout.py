@@ -18,3 +18,9 @@ async def logout_user(token, session):
     except HTTPException as http_exc:
         await session.rollback()
         raise http_exc
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed: {str(e)}"
+        )

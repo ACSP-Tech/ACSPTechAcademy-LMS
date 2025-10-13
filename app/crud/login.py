@@ -60,7 +60,12 @@ async def user_login(data, session, backgroundtask):
         )
     except HTTPException as Httpexc:
         raise Httpexc
-
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed: {str(e)}"
+        )
         
         
         
