@@ -70,3 +70,14 @@ class UserEmail(BaseModel):
     @field_validator("email")
     def normalize_email(cls, v: str) -> str:
         return v.strip().lower()
+    
+class UserPhone(BaseModel):
+    phone_number: str
+    @field_validator("phone_number")
+    def validate_phone_number(cls, v: str) -> str:
+        v = v.strip()
+        # E.164 regex: starts with +, then 1-15 digits
+        pattern = re.compile(r'^\+[1-9]\d{1,14}$')
+        if not pattern.match(v):
+            raise ValueError("Phone number must be in valid E.164 format (e.g., +14155552671)")
+        return v

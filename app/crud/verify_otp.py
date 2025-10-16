@@ -10,7 +10,7 @@ async def user_verify_otp(data, session):
         user_email = data.email
         otp = data.otp
         # Check if valid forget email request exists
-        statement = select(OTP).where(and_(OTP.email == user_email, OTP.status == "Pending"))
+        statement = select(OTP).where(and_(OTP.email == user_email, OTP.status == "Pending",  OTP.otp_type == "password_reset"))
         result = await session.execute(statement)
         otp_entry_check = result.scalars().first()
         if not otp_entry_check:

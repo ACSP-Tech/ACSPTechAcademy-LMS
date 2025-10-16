@@ -64,6 +64,7 @@ class OTP(SQLModel, table=True):
     attempts: int = Field(default=0, sa_column=Column(Integer, nullable=False, index=True))
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
     expires_at: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
+    otp_type: str = Field(sa_column=Column(String, nullable=False, index=True))
     verified: bool = Field(default=False, sa_column=Column(Boolean, index=True))
     status: str = Field(default="Pending", sa_column=Column(String, nullable=False, index=True))
     updated_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False))

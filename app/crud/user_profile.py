@@ -269,3 +269,38 @@ async def edit_current_user_email(data, backgroundtask, token, session):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to update email: {str(e)}"
         )
+    
+async def edit_phone_number(data, session, token):
+    try:
+        #get payload from token
+        payload = await decode_token(token)
+        id = payload.get("id")
+        user_email = payload.get("email")
+        #get user from db
+        user_statement = select(Users).where(and_(Users.id == id, Users.email == user_email))
+        result = await session.execute(user_statement)
+        user = result.scalars().first()
+        #check if phone number already exists
+        phone_statement = select(Users).where(Users.phone_number == data.phone_number)
+        phone_result = await session.execute(phone_statement)
+        phone_user = phone_result.scalars().first()
+        if phone_user:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Enter a different phone number, {data.phone_number} already exists"
+            )
+        user.phone_number = data.phone_number
+        # commit changes
+        await session.commit()
+        await session.refresh(user)
+        response = "User phone number updated successfully"
+        return MessageOut(message=response)
+    except HTTPException:
+        await session.rollback()
+        raise
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update phone number: {str(e)}"
+        )

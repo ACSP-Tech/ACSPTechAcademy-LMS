@@ -17,7 +17,8 @@ async def user_reset_password(data, session):
                     OTP.email == user_email,
                     OTP.status == "Available",
                     OTP.verified == True,
-                    OTP.otp_code == user_otp
+                    OTP.otp_code == user_otp,
+                    OTP.otp_type == "password_reset"
                 )
             )
         otp_result = await session.execute(otp_stmt)

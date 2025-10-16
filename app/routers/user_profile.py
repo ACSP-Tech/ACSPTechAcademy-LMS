@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File, BackgroundTasks
 from ..database_setup import get_db
 from ..dep.authen import user_auth
-from ..schema.user_profile import UserProfileResponse, GenderEnum, ProfileResponse, ChangePassword, UserEmail, UserPhone, VerifyPhone
-from ..crud.user_profile import edit_current_user, user_delete_profile_picture, get_current_user, change_password, edit_current_user_email
+from ..schema.user_profile import UserProfileResponse, GenderEnum, ProfileResponse, ChangePassword, UserEmail, UserPhone
+from ..crud.user_profile import edit_current_user, user_delete_profile_picture, get_current_user, change_password, edit_current_user_email, edit_phone_number
 from typing import Annotated, Optional
 from ..schema.register import MessageOut
 
@@ -105,17 +105,17 @@ async def edit_user_email(data:UserEmail, backgroundtask:BackgroundTasks, sessio
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
     
-@router.post("/profile/verify-phone-number", response_model=MessageOut, status_code=status.HTTP_200_OK)
-async def verify_phone_number(data:VerifyPhone, session = Depends(get_db), token = Depends(user_auth)):
-    """
-    Verify user's phone number with OTP.
-    """
-    try:
-        return await edit_current_user_email(data, session, token)
-    except HTTPException as Httpexc:
-        raise Httpexc
-    except Exception as exc:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
+# @router.post("/profile/verify-phone-number", response_model=MessageOut, status_code=status.HTTP_200_OK)
+# async def verify_phone_number(data:VerifyPhone, session = Depends(get_db), token = Depends(user_auth)):
+#     """
+#     Verify user's phone number with OTP.
+#     """
+#     try:
+#         return await edit_current_user_email(data, session, token)
+#     except HTTPException as Httpexc:
+#         raise Httpexc
+#     except Exception as exc:
+#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
 
     
 @router.patch("/pofile/edit-phone-nuber", response_model=MessageOut, status_code=status.HTTP_201_OK)
@@ -124,7 +124,7 @@ async def edit_user_email(data:UserPhone, backgroundtask:BackgroundTasks, sessio
     Edit user email.
     """
     try:
-        return await edit_current_user_email(data, backgroundtask, session, token)
+        return await edit_phone_number(data, backgroundtask, session, token)
     except HTTPException as Httpexc:
         raise Httpexc
     except Exception as exc:
