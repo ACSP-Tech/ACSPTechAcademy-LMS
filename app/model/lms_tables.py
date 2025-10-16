@@ -2,7 +2,7 @@ import uuid
 from sqlmodel import SQLModel, Field, Column, Relationship
 from datetime import datetime, date
 from pydantic import EmailStr, field_validator
-from sqlalchemy import String, func, DateTime, Integer, desc, Index, Boolean
+from sqlalchemy import String, func, DateTime, Integer, desc, Index, Boolean, text
 from typing import List, Optional
 
 class Users(SQLModel, table=True):
@@ -25,9 +25,9 @@ class Users(SQLModel, table=True):
         sa_column=Column(String, nullable=False, index=True))
     role: str = Field(
         sa_column=Column(String, nullable=False, index=True))
-    is_active: bool = Field(sa_column=Column(Boolean, nullable=True, server_default="false", index=True))
-    verify: bool = Field(sa_column=Column(Boolean, nullable=False, server_default="false", index=True))
-    num_verify: bool = Field(sa_column=Column(Boolean, nullable=False, server_default="false", index=True))
+    is_active: bool = Field(default=True, sa_column=Column(Boolean, nullable=False, server_default=text("true"), index=True))
+    verify: bool = Field(default=False, sa_column=Column(Boolean, nullable=False, server_default=text("false"), index=True))
+    num_verify: bool = Field(default=False, sa_column=Column(Boolean, nullable=False, server_default=text("false"), index=True))
     version: int = Field(default= 0, sa_column=Column(Integer, nullable=False, index=True))
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
     updated_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False))
@@ -64,8 +64,8 @@ class OTP(SQLModel, table=True):
     attempts: int = Field(default=0, sa_column=Column(Integer, nullable=False, index=True))
     created_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), nullable=False))
     expires_at: datetime = Field(sa_column=Column(DateTime(timezone=True), nullable=False))
-    otp_type: str = Field(sa_column=Column(String, nullable=False, index=True))
-    verified: bool = Field(default=False, sa_column=Column(Boolean, index=True))
+    otp_type: str = Field(sa_column=Column(String, nullable=False, server_default=text("'password_reset'"), index=True))
+    verified: bool = Field(default=False, sa_column=Column(Boolean, nullable=False, server_default=text("false"), index=True))
     status: str = Field(default="Pending", sa_column=Column(String, nullable=False, index=True))
     updated_at: datetime = Field(sa_column=Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False))
     #foreign key

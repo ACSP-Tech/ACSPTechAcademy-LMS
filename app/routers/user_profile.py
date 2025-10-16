@@ -8,7 +8,7 @@ from ..schema.register import MessageOut
 
 router = APIRouter(prefix="/user", tags=["Users Profile CRUD"])
 
-@router.patch("/profile/edit-info", response_model=UserProfileResponse, status_code=status.HTTP_201_CREATED)
+@router.patch("/profile/edit-info", response_model=MessageOut, status_code=status.HTTP_201_CREATED)
 async def edit_user_profile(firstname: Annotated[Optional[str], Form()] = None, 
                             lastname: Annotated[Optional[str], Form()] = None, 
                             user_gender: Annotated[Optional[GenderEnum], Form()] = None,

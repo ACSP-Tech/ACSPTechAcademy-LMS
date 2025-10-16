@@ -12,6 +12,8 @@ class GenderEnum(str, Enum):
     NON_BINARY = "Non-Binary"
     PREFER_NOT_TO_SAY = "Prefer not to say"
     OTHER = "Other"
+    none = ""
+    
 
 class UserProfileResponse(BaseModel):
     id: str
@@ -81,3 +83,5 @@ class UserPhone(BaseModel):
         if not pattern.match(v):
             raise ValueError("Phone number must be in valid E.164 format (e.g., +14155552671)")
         return v
+    
+    
