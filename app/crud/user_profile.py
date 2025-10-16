@@ -1,5 +1,5 @@
 import cloudinary.uploader
-from ..utils import decode_token
+from ..utils.payload import decode_token
 from ..model.lms_tables import Users, BlackList
 from fastapi import HTTPException, status
 from sqlmodel import select, and_
