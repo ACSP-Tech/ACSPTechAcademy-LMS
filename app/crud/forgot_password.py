@@ -30,7 +30,7 @@ async def user_forgot_password(data, session, backgroundtask):
         #batch expire existing otp if any
         await session.execute(
             update(OTP)
-            .where(and_(OTP.user_id == user.id, OTP.status.in_(["Pending", "Available"])))
+            .where(and_(OTP.user_id == user.id, OTP.otp_type == "password_reset", OTP.status.in_(["Pending", "Available"])))
             .values(
                 status="Expired",
                 expires_at=datetime.now(timezone.utc)
@@ -45,7 +45,8 @@ async def user_forgot_password(data, session, backgroundtask):
             email=user.email,
             otp_code=otp,
             user_id=user.id,
-            expires_at=otp_expires_at
+            expires_at=otp_expires_at,
+            otp_type = "password_reset",
         )
         session.add(new_otp)
         await session.commit()
@@ -62,4 +63,10 @@ async def user_forgot_password(data, session, backgroundtask):
     except HTTPException as Httpexc:
         await session.rollback()
         raise Httpexc
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed: {str(e)}"
+        )  
 

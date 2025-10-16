@@ -4,17 +4,28 @@ from .setup_main import configure_cors
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .database_setup import init_db
 from contextlib import asynccontextmanager
+from .setup_main import cleanup_otp
+import asyncio
 
 
 #import router
-from .routers import keep_alive, root, register, verify, login, resend_email, logout, forgot_password, reset_password, verify_otp
+from .routers import keep_alive, root, register, verify, login, resend_email, logout, forgot_password, reset_password, verify_otp, user_profile
 
 #scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Start-up code
     await init_db()
-    yield
+    otp_cleanup_task = asyncio.create_task(cleanup_otp())
+    try:
+        yield
+    finally:
+        otp_cleanup_task.cancel()
+        try:
+            await otp_cleanup_task
+        except asyncio.CancelledError:
+            pass
 
 
 
@@ -41,3 +52,4 @@ app.include_router(logout.router)
 app.include_router(forgot_password.router)
 app.include_router(reset_password.router)
 app.include_router(verify_otp.router)
+app.include_router(user_profile.router)

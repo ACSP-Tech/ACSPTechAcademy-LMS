@@ -17,7 +17,8 @@ async def user_reset_password(data, session):
                     OTP.email == user_email,
                     OTP.status == "Available",
                     OTP.verified == True,
-                    OTP.otp_code == user_otp
+                    OTP.otp_code == user_otp,
+                    OTP.otp_type == "password_reset"
                 )
             )
         otp_result = await session.execute(otp_stmt)
@@ -76,3 +77,9 @@ async def user_reset_password(data, session):
     except HTTPException as Httpexc:
         await session.rollback()
         raise Httpexc
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed: {str(e)}"
+        )
