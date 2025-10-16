@@ -39,7 +39,7 @@ async def edit_user_profile(firstname: Annotated[Optional[str], Form()] = None,
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
 
 
-@router.patch("/profile/delete-picture", response_model=MessageOut, status_code=status.HTTP_201_OK)
+@router.patch("/profile/delete-picture", response_model=MessageOut, status_code=status.HTTP_200_OK)
 async def delete_profile_picture(session = Depends(get_db), token = Depends(user_auth)):
     """
     Delete user's profile picture.
@@ -73,7 +73,7 @@ async def get_user_profile(session = Depends(get_db), token = Depends(user_auth)
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
     
-@router.patch("/profile/change-password", response_model=MessageOut, status_code=status.HTTP_201_OK)
+@router.patch("/profile/change-password", response_model=MessageOut, status_code=status.HTTP_200_OK)
 async def change_user_password(data: ChangePassword, 
                                session = Depends(get_db), 
                                token = Depends(user_auth)):
@@ -93,7 +93,7 @@ async def change_user_password(data: ChangePassword,
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
     
-@router.patch("/pofile/edit-email", response_model=MessageOut, status_code=status.HTTP_201_OK)
+@router.patch("/pofile/edit-email", response_model=MessageOut, status_code=status.HTTP_200_OK)
 async def edit_user_email(data:UserEmail, backgroundtask:BackgroundTasks, session = Depends(get_db), token = Depends(user_auth)):
     """
     Edit user email.
@@ -118,7 +118,7 @@ async def edit_user_email(data:UserEmail, backgroundtask:BackgroundTasks, sessio
 #         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
 
     
-@router.patch("/pofile/edit-phone-nuber", response_model=MessageOut, status_code=status.HTTP_201_OK)
+@router.patch("/pofile/edit-phone-nuber", response_model=MessageOut, status_code=status.HTTP_200_OK)
 async def edit_user_email(data:UserPhone, backgroundtask:BackgroundTasks, session = Depends(get_db), token = Depends(user_auth)):
     """
     Edit user email.
