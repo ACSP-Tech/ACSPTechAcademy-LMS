@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form,
 from ..database_setup import get_db
 from ..dep.authen import user_auth
 from ..schema.user_profile import UserProfileResponse, GenderEnum, ProfileResponse, ChangePassword, UserEmail, UserPhone
-from ..crud.user_profile import edit_current_user, user_delete_profile_picture, get_current_user, change_password, edit_current_user_email, edit_phone_number
+from ..crud.user_profile import edit_current_user, user_delete_profile_picture, get_current_user, change_password, edit_current_user_email, edit_user_number
 from typing import Annotated, Optional
 from ..schema.register import MessageOut
 
@@ -93,13 +93,13 @@ async def change_user_password(data: ChangePassword,
     except Exception as exc:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
     
-@router.patch("/pofile/edit-email", response_model=MessageOut, status_code=status.HTTP_200_OK)
+@router.patch("/profile/edit-email", response_model=MessageOut, status_code=status.HTTP_200_OK)
 async def edit_user_email(data:UserEmail, backgroundtask:BackgroundTasks, session = Depends(get_db), token = Depends(user_auth)):
     """
     Edit user email.
     """
     try:
-        return await edit_current_user_email(data, backgroundtask, session, token)
+        return await edit_current_user_email(data, backgroundtask, token, session)
     except HTTPException as Httpexc:
         raise Httpexc
     except Exception as exc:
@@ -118,13 +118,13 @@ async def edit_user_email(data:UserEmail, backgroundtask:BackgroundTasks, sessio
 #         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
 
     
-@router.patch("/pofile/edit-phone-nuber", response_model=MessageOut, status_code=status.HTTP_200_OK)
-async def edit_user_email(data:UserPhone, backgroundtask:BackgroundTasks, session = Depends(get_db), token = Depends(user_auth)):
+@router.patch("/profile/edit-phone-number", response_model=MessageOut, status_code=status.HTTP_200_OK)
+async def edit_user_email(data:UserPhone, session = Depends(get_db), token = Depends(user_auth)):
     """
     Edit user email.
     """
     try:
-        return await edit_phone_number(data, backgroundtask, session, token)
+        return await edit_user_number(data, session, token)
     except HTTPException as Httpexc:
         raise Httpexc
     except Exception as exc:

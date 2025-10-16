@@ -20,9 +20,9 @@ async def verify_user(token, backgroundtask, session):
         result = await session.execute(statement)
         user = result.scalars().first()
         if not user:
-            response = "Email verified successfully! you can Check your mail for the next steps, You can now login."
-            return MessageOut(
-                message=response
+            raise HTTPException(
+                status_code=status.HTTP_202_ACCEPTED,
+                detail= "Email verified successfully! you can Check your mail for the next steps, You can now login."
             )
         if not user.is_active:
             raise HTTPException(

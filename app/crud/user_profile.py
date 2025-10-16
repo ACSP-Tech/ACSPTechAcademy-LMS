@@ -8,6 +8,7 @@ from ..schema.register import MessageOut
 from ..utils.hash_password import password_hash, password_verify
 from ..utils.payload import encode_email_token
 from ..utils.background_email import send_verification_email
+from ..utils.general import normalize
 
 from decouple import config
 cloudinary.config(
@@ -29,6 +30,12 @@ async def edit_current_user(firstname, lastname, user_gender, profile_image, cou
         user = result.scalars().first()
         #Track changes to be made
         changes = False
+        firstname = normalize(firstname)
+        lastname = normalize(lastname)
+        user_gender = normalize(user_gender)
+        country = normalize(country)
+        
+        # Update fields if new values are provided
         if firstname is not None:
             user.first_name = firstname
             changes = True
@@ -247,8 +254,8 @@ async def edit_current_user_email(data, backgroundtask, token, session):
  
         payload = {
             "email": data.email,
-            "first_name": data.first_name,
-            "phone_number": data.phone_number,
+            "first_name": user.first_name,
+            "phone_number": user.phone_number,
             "type": "email_verification"
         }
         email_token = await encode_email_token(payload)
@@ -256,7 +263,7 @@ async def edit_current_user_email(data, backgroundtask, token, session):
             send_verification_email,
             email=data.email,
             token=email_token,
-            username=data.first_name
+            username=user.first_name
         )
         response = "User email updated successfully, Verification email has been sent. Kindly verify your new email and login again"
         return MessageOut(message=response)
@@ -270,7 +277,7 @@ async def edit_current_user_email(data, backgroundtask, token, session):
             detail=f"Failed to update email: {str(e)}"
         )
     
-async def edit_phone_number(data, session, token):
+async def edit_user_number(data, session, token):
     try:
         #get payload from token
         payload = await decode_token(token)
