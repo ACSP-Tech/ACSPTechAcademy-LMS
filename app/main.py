@@ -4,7 +4,7 @@ from .setup_main import configure_cors
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .database_setup import init_db
 from contextlib import asynccontextmanager
-from setup_main import cleanup_otp
+from .setup_main import cleanup_otp
 import asyncio
 
 
