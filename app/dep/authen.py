@@ -20,12 +20,12 @@ async def user_auth(token=Depends(oauth2_scheme), session=Depends(get_db)):
            detail=str(e)
        )
    
-def student_auth(token=Depends(user_auth)):
+async def student_auth(token=Depends(user_auth)):
     """
     Dependency to ensure the user is an admin or superadmin.
     """
     try:
-        payload = decode_token(token)
+        payload = await decode_token(token)
         role = payload.get("role")
         if role not in ["student", "teacher", "admin", "superadmin"]:
             raise HTTPException(
@@ -36,12 +36,12 @@ def student_auth(token=Depends(user_auth)):
     except HTTPException as http_exc:
        raise http_exc 
    
-def teacher_auth(token=Depends(user_auth)):
+async def teacher_auth(token=Depends(user_auth)):
     """
     Dependency to ensure the user is an admin or superadmin.
     """
     try:
-        payload = decode_token(token)
+        payload = await decode_token(token)
         role = payload.get("role")
         if role not in ["teacher", "admin", "superadmin"]:
             raise HTTPException(
@@ -52,12 +52,12 @@ def teacher_auth(token=Depends(user_auth)):
     except HTTPException as http_exc:
        raise http_exc   
    
-def admin_auth(token=Depends(user_auth)):
+async def admin_auth(token=Depends(user_auth)):
     """
     Dependency to ensure the user is an admin or superadmin.
     """
     try:
-        payload = decode_token(token)
+        payload = await decode_token(token)
         role = payload.get("role")
         if role not in ["admin", "superadmin"]:
             raise HTTPException(
@@ -68,12 +68,12 @@ def admin_auth(token=Depends(user_auth)):
     except HTTPException as http_exc:
        raise http_exc
    
-def superadmin_auth(token=Depends(user_auth)):
+async def superadmin_auth(token=Depends(user_auth)):
    """
    Dependency to ensure the user is a superadmin.
    """
    try:
-       payload = decode_token(token)
+       payload = await decode_token(token)
        role = payload.get("role")
        if role != "superadmin":
            raise HTTPException(

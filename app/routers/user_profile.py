@@ -6,7 +6,7 @@ from ..crud.user_profile import edit_current_user, user_delete_profile_picture, 
 from typing import Annotated, Optional
 from ..schema.register import MessageOut
 
-router = APIRouter(prefix="/user", tags=["Users Profile CRUD"])
+router = APIRouter(prefix="/user", tags=["Profile CRUD"])
 
 @router.patch("/profile/edit-info", response_model=MessageOut, status_code=status.HTTP_201_CREATED)
 async def edit_user_profile(firstname: Annotated[Optional[str], Form()] = None, 
@@ -97,6 +97,8 @@ async def change_user_password(data: ChangePassword,
 async def edit_user_email(data:UserEmail, backgroundtask:BackgroundTasks, session = Depends(get_db), token = Depends(user_auth)):
     """
     Edit user email.
+    Args: 
+        - Data: Body schema which include new user email
     """
     try:
         return await edit_current_user_email(data, backgroundtask, token, session)
@@ -119,9 +121,11 @@ async def edit_user_email(data:UserEmail, backgroundtask:BackgroundTasks, sessio
 
     
 @router.patch("/profile/edit-phone-number", response_model=MessageOut, status_code=status.HTTP_200_OK)
-async def edit_user_email(data:UserPhone, session = Depends(get_db), token = Depends(user_auth)):
+async def edit_user_phone_number(data:UserPhone, session = Depends(get_db), token = Depends(user_auth)):
     """
-    Edit user email.
+    Edit user phone number.
+    Args:
+        - Data : Body schema for new user phone number, phone number validation field in regiser still applies
     """
     try:
         return await edit_user_number(data, session, token)

@@ -6,10 +6,11 @@ from .database_setup import init_db
 from contextlib import asynccontextmanager
 from .setup_main import cleanup_otp
 import asyncio
+from fastapi_pagination import add_pagination
 
 
 #import router
-from .routers import keep_alive, root, register, verify, login, resend_email, logout, forgot_password, reset_password, verify_otp, user_profile
+from .routers import keep_alive, root, register, verify, login, resend_email, logout, forgot_password, reset_password, verify_otp, user_profile, super_admin
 
 #scheduler = AsyncIOScheduler()
 
@@ -53,3 +54,9 @@ app.include_router(forgot_password.router)
 app.include_router(reset_password.router)
 app.include_router(verify_otp.router)
 app.include_router(user_profile.router)
+app.include_router(super_admin.router)
+
+
+
+#adding pagination to the app
+add_pagination(app)
